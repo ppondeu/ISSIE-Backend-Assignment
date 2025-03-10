@@ -17,5 +17,20 @@ model Rider {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
+  location RiderLocation?
+
   @@map("riders")
+}
+
+model RiderLocation {
+  id        Int      @id @default(autoincrement())
+  riderId   Int      @unique @map("rider_id")
+  latitude  Float
+  longitude Float
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  rider Rider @relation(fields: [riderId], references: [id])
+
+  @@map("rider_locations")
 }

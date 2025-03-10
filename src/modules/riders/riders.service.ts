@@ -1,9 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateRiderDto } from './dto/create-rider.dto';
-import { UpdateRiderDto } from './dto/update-rider.dto';
 import { PrismaService } from 'src/modules/prisma';
-import { Rider } from '@prisma/client';
+import { Rider, RiderLocation } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { UpsertRiderLocationDto, CreateRiderDto, UpdateRiderDto } from './dto';
 
 @Injectable()
 export class RidersService {
@@ -25,9 +24,7 @@ export class RidersService {
   }
 
   async findAll(): Promise<Rider[]> {
-    const riders = await this.prismaService.rider.findMany({});
-    console.log("reders", riders);
-    return riders;
+    return this.prismaService.rider.findMany({});
   }
 
   async findOne(id: number): Promise<Rider> {
@@ -72,4 +69,46 @@ export class RidersService {
       }
     }
   }
+
+  async upsertLocation(riderId: number, upsertRiderLocationDto: UpsertRiderLocationDto): Promise<RiderLocation> {
+    await this.findOne(riderId);
+    try {
+      const result = await this.prismaService.riderLocation.upsert({
+        where: { riderId },
+        update: upsertRiderLocationDto,
+        create: {
+          ...upsertRiderLocationDto,
+          riderId,
+        },
+        include: { rider: true },
+      });
+      return result;
+    } catch (err: unknown) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === "P2002") {
+          throw new BadRequestException(`Email#${riderId} already exists.`);
+        } else if (err.code === "P2025") {
+          throw new NotFoundException(`Rider with ID#${riderId} not found.`);
+        }
+      }
+    }
+  }
+
+  async getLocation(riderId: number) {
+    try {
+      const result = await this.prismaService.riderLocation.findUniqueOrThrow({
+        where: { riderId },
+        include: { rider: true },
+      });
+
+      return result;
+    } catch (err: unknown) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === "P2025") {
+          throw new NotFoundException(`Rider with ID#${riderId} not found.`);
+        }
+      }
+    }
+  }
+
 }

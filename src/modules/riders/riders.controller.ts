@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { RidersService } from './riders.service';
-import { CreateRiderDto, UpdateRiderDto, IdParamsDto } from './dto';
+import { CreateRiderDto, UpdateRiderDto, IdParamsDto, UpsertRiderLocationDto, RiderIdParamsDto } from './dto';
 import { APIResponse } from 'src/common';
-import { Rider } from '@prisma/client';
+import { Rider, RiderLocation } from '@prisma/client';
 
 @Controller('riders')
 export class RidersController {
@@ -44,7 +44,6 @@ export class RidersController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async update(@Param() { id }: IdParamsDto, @Body() updateRiderDto: UpdateRiderDto) {
-    console.debug("update update rider dto", updateRiderDto);
     const result = await this.ridersService.update(+id, updateRiderDto);
     return {
       statusCode: HttpStatus.OK,
@@ -61,5 +60,27 @@ export class RidersController {
       statusCode: HttpStatus.OK,
       message: [`Delete rider ID#${id} successfully.`],
     } satisfies APIResponse<Rider>
+  }
+
+  @Post(':riderId/locations')
+  @HttpCode(HttpStatus.OK)
+  async upsertLocation(@Param() { riderId }: RiderIdParamsDto, @Body() upsertRiderLocationDto: UpsertRiderLocationDto): Promise<APIResponse<RiderLocation>> {
+    const result = await this.ridersService.upsertLocation(+riderId, upsertRiderLocationDto);
+    return {
+      statusCode: HttpStatus.OK,
+      message: ["Create rider location successfully."],
+      data: result,
+    } satisfies APIResponse<RiderLocation>
+  }
+
+  @Get(':riderId/locations')
+  @HttpCode(HttpStatus.OK)
+  async getLocation(@Param() { riderId }: RiderIdParamsDto): Promise<APIResponse<RiderLocation>> {
+    const result = await this.ridersService.getLocation(+riderId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: ["Fetch rider location successfully."],
+      data: result,
+    } satisfies APIResponse<RiderLocation>
   }
 }
