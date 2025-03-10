@@ -30,7 +30,7 @@ model RiderLocation {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  rider Rider @relation(fields: [riderId], references: [id])
+  rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
 
   @@map("rider_locations")
 }
