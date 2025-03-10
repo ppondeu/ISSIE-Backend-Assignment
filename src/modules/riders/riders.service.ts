@@ -3,6 +3,7 @@ import { PrismaService } from 'src/modules/prisma';
 import { Rider, RiderLocation } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UpsertRiderLocationDto, CreateRiderDto, UpdateRiderDto } from './dto';
+import { haversine } from 'src/common';
 
 @Injectable()
 export class RidersService {
@@ -71,7 +72,6 @@ export class RidersService {
   }
 
   async upsertLocation(riderId: number, upsertRiderLocationDto: UpsertRiderLocationDto): Promise<RiderLocation> {
-    await this.findOne(riderId);
     try {
       const result = await this.prismaService.riderLocation.upsert({
         where: { riderId },
@@ -109,6 +109,15 @@ export class RidersService {
         }
       }
     }
+  }
+
+  async findRidersWithinRadius(latitude: number, longitude: number, radius = 5): Promise<RiderLocation[]> {
+    const riders = await this.prismaService.riderLocation.findMany({ include: { rider: true } });
+
+    return riders.filter(rider => {
+      const distance = haversine(latitude, longitude, rider.latitude, rider.longitude);
+      return distance <= radius;
+    });
   }
 
 }

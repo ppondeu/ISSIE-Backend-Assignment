@@ -1,12 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { RidersService } from './riders.service';
-import { CreateRiderDto, UpdateRiderDto, IdParamsDto, UpsertRiderLocationDto, RiderIdParamsDto } from './dto';
+import { CreateRiderDto, UpdateRiderDto, IdParamsDto, UpsertRiderLocationDto, RiderIdParamsDto, LatLongDto } from './dto';
 import { APIResponse } from 'src/common';
 import { Rider, RiderLocation } from '@prisma/client';
 
 @Controller('riders')
 export class RidersController {
   constructor(private readonly ridersService: RidersService) { }
+
+  @Get('search')
+  @HttpCode(HttpStatus.OK)
+  async searchRiders(@Query() { latitude, longitude }: LatLongDto): Promise<APIResponse<RiderLocation[]>> {
+    const result = await this.ridersService.findRidersWithinRadius(latitude, longitude);
+    return {
+      statusCode: HttpStatus.OK,
+      message: ["Fetch rider within 5 Km. successfully."],
+      data: result,
+    } satisfies APIResponse<RiderLocation[]>
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -65,6 +76,7 @@ export class RidersController {
   @Post(':riderId/locations')
   @HttpCode(HttpStatus.OK)
   async upsertLocation(@Param() { riderId }: RiderIdParamsDto, @Body() upsertRiderLocationDto: UpsertRiderLocationDto): Promise<APIResponse<RiderLocation>> {
+    await this.ridersService.findOne(+riderId);
     const result = await this.ridersService.upsertLocation(+riderId, upsertRiderLocationDto);
     return {
       statusCode: HttpStatus.OK,
@@ -83,4 +95,5 @@ export class RidersController {
       data: result,
     } satisfies APIResponse<RiderLocation>
   }
+
 }
