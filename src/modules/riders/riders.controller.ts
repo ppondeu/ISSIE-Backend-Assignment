@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { RidersService } from './riders.service';
-import { CreateRiderDto, UpdateRiderDto, IdParamsDto, UpsertRiderLocationDto, RiderIdParamsDto, LatLongDto } from './dto';
+import { CreateRiderDto, UpdateRiderDto, IdParamsDto, RiderIdParamsDto, LatLongDto } from './dto';
 import { APIResponse } from 'src/common';
 import { Rider, RiderLocation } from '@prisma/client';
 
@@ -75,8 +75,7 @@ export class RidersController {
 
   @Post(':riderId/locations')
   @HttpCode(HttpStatus.OK)
-  async upsertLocation(@Param() { riderId }: RiderIdParamsDto, @Body() upsertRiderLocationDto: UpsertRiderLocationDto): Promise<APIResponse<RiderLocation>> {
-    await this.ridersService.findOne(+riderId);
+  async upsertLocation(@Param() { riderId }: RiderIdParamsDto, @Body() upsertRiderLocationDto: any): Promise<APIResponse<RiderLocation>> {
     const result = await this.ridersService.upsertLocation(+riderId, upsertRiderLocationDto);
     return {
       statusCode: HttpStatus.OK,

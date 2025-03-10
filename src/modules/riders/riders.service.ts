@@ -2,8 +2,8 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from 'src/modules/prisma';
 import { Rider, RiderLocation } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { UpsertRiderLocationDto, CreateRiderDto, UpdateRiderDto } from './dto';
-import { haversine } from 'src/common';
+import { CreateRiderDto, CreateRiderLocationDto, CreateRiderLocationSchema, UpdateRiderDto, UpdateRiderLocationDto, UpdateRiderLocationSchema } from './dto';
+import { haversine, extractZodErrorMessage } from 'src/common';
 
 @Injectable()
 export class RidersService {
@@ -71,26 +71,48 @@ export class RidersService {
     }
   }
 
-  async upsertLocation(riderId: number, upsertRiderLocationDto: UpsertRiderLocationDto): Promise<RiderLocation> {
-    try {
-      const result = await this.prismaService.riderLocation.upsert({
-        where: { riderId },
-        update: upsertRiderLocationDto,
-        create: {
-          ...upsertRiderLocationDto,
+  async upsertLocation(riderId: number, upsertRiderLocationDto: any): Promise<RiderLocation> {
+    await this.findOne(riderId);
+
+    const existingLocation = await this.prismaService.riderLocation.findUnique({
+      where: { riderId },
+    });
+
+    if (existingLocation) {
+      const validated = UpdateRiderLocationSchema.safeParse(upsertRiderLocationDto);
+      if (!validated.success) {
+        throw new BadRequestException(extractZodErrorMessage(validated.error));
+      }
+
+      const updateRiderLocationDto: UpdateRiderLocationDto = {
+        latitude: validated.data.latitude,
+        longitude: validated.data.longitude
+      }
+
+      const result = await this.prismaService.riderLocation.update({
+        data: updateRiderLocationDto,
+        where: { riderId }
+      })
+
+      return result;
+    } else {
+      const validated = CreateRiderLocationSchema.safeParse(upsertRiderLocationDto);
+      if (!validated.success) {
+        throw new BadRequestException(extractZodErrorMessage(validated.error));
+      }
+
+      const createRiderLocationDto: CreateRiderLocationDto = {
+        latitude: validated.data.latitude,
+        longitude: validated.data.longitude
+      }
+
+      const result = await this.prismaService.riderLocation.create({
+        data: {
+          ...createRiderLocationDto,
           riderId,
         },
-        include: { rider: true },
-      });
+      })
       return result;
-    } catch (err: unknown) {
-      if (err instanceof PrismaClientKnownRequestError) {
-        if (err.code === "P2002") {
-          throw new BadRequestException(`Email#${riderId} already exists.`);
-        } else if (err.code === "P2025") {
-          throw new NotFoundException(`Rider with ID#${riderId} not found.`);
-        }
-      }
     }
   }
 
@@ -116,6 +138,8 @@ export class RidersService {
 
     return riders.filter(rider => {
       const distance = haversine(latitude, longitude, rider.latitude, rider.longitude);
+      console.log("dist", distance);
+      console.log("red", radius);
       return distance <= radius;
     });
   }
