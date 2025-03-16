@@ -29,16 +29,9 @@ export class RidersService {
   }
 
   async findOne(id: number): Promise<Rider> {
-    try {
-      const result = await this.prismaService.rider.findUniqueOrThrow({ where: { id } })
-      return result;
-    } catch (err: unknown) {
-      if (err instanceof PrismaClientKnownRequestError) {
-        if (err.code === "P2025") {
-          throw new NotFoundException(`Rider with ID#${id} not found.`);
-        }
-      }
-    }
+    const result = await this.prismaService.rider.findUnique({ where: { id } })
+    if (!result) throw new NotFoundException(`Rider with ID#${id} not found.`);
+    return result;
   }
 
   async update(id: number, updateRiderDto: UpdateRiderDto): Promise<Rider> {
@@ -50,6 +43,7 @@ export class RidersService {
       return result;
     } catch (err: unknown) {
       if (err instanceof PrismaClientKnownRequestError) {
+        console.error(`[PrismaError]: ${err.message}`);
         if (err.code === "P2002") {
           throw new BadRequestException(`Email#${updateRiderDto.email} already exists.`);
         } else if (err.code === "P2025") {
@@ -136,12 +130,12 @@ export class RidersService {
   async findRidersWithinRadius(latitude: number, longitude: number, radius = 5): Promise<RiderLocation[]> {
     const riders = await this.prismaService.riderLocation.findMany({ include: { rider: true } });
 
-    return riders.filter(rider => {
+    const result =  riders.filter(rider => {
       const distance = haversine(latitude, longitude, rider.latitude, rider.longitude);
-      console.log("dist", distance);
-      console.log("red", radius);
       return distance <= radius;
     });
+
+    return result;
   }
 
 }
