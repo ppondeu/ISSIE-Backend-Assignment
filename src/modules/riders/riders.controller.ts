@@ -79,7 +79,7 @@ export class RidersController {
     const result = await this.ridersService.upsertLocation(+riderId, upsertRiderLocationDto);
     return {
       statusCode: HttpStatus.OK,
-      message: ["Create rider location successfully."],
+      message: ["Upsert rider location successfully."],
       data: result,
     } satisfies APIResponse<RiderLocation>
   }
