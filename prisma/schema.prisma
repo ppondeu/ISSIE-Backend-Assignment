@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Rider {
+  id           Int      @id @default(autoincrement())
+  firstName    String   @map("first_name")
+  lastName     String   @map("last_name")
+  email        String   @unique
+  licensePlate String   @map("license_plate")
+  phoneNumber  String   @map("phone_number")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  location RiderLocation?
+
+  @@map("riders")
+}
+
+model RiderLocation {
+  id        Int      @id @default(autoincrement())
+  riderId   Int      @unique @map("rider_id")
+  latitude  Float
+  longitude Float
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
+
+  @@map("rider_locations")
+}

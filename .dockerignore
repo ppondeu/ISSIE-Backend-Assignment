@@ -1,0 +1,7 @@
+.git
+test
+node_modules
+.gitignore
+.prettierrc
+Dockerfile*
+dist/
