@@ -1,7 +1,9 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsNumber, Max, Min, IsDefined } from 'class-validator';
 
 export class LatLongDto {
+    @ApiProperty({ example: -20.1923, description: 'Latitude of the user location' })
     @IsDefined({ message: 'Latitude is required.' })
     @Transform(({ value }) => {
         if (isNaN(value) || value === '' || value === null) {
@@ -14,6 +16,7 @@ export class LatLongDto {
     @Max(90, { message: 'Latitude must be between -90 and 90.' })
     latitude: number;
 
+    @ApiProperty({ example: 150.775565, description: 'Longitude of the user location' })
     @IsDefined({ message: 'Longitude is required.' })
     @Transform(({ value }) => {
         if (isNaN(value) || value === '' || value === null) {
