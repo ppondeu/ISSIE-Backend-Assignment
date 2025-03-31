@@ -33,13 +33,13 @@ export class RidersController {
         data: [
           {
             "id": 1,
-            "riderId": 2,
+            "riderId": 1,
             "latitude": -20.1923,
             "longitude": 150.775565,
             "createdAt": "2025-03-10T06:40:04.956Z",
             "updatedAt": "2025-03-10T12:26:35.067Z",
             "rider": {
-              "id": 2,
+              "id": 1,
               "firstName": "Rico",
               "lastName": "Orelly",
               "email": "rico.orelly@gmail.com",
@@ -73,7 +73,7 @@ export class RidersController {
         statusCode: 201,
         message: ["Create rider successfully."],
         data: {
-          "id": 1,
+          "id": 12,
           "firstName": "Mike",
           "lastName": "Smith",
           "email": "mike.smith@gmail.com",
@@ -108,7 +108,7 @@ export class RidersController {
         ],
         "data": [
           {
-            "id": 2,
+            "id": 1,
             "firstName": "Rico",
             "lastName": "Orelly",
             "email": "rico.orelly@gmail.com",
@@ -150,10 +150,10 @@ export class RidersController {
       example: {
         "statusCode": 200,
         "message": [
-          "Fetch rider ID#2 successfully."
+          "Fetch rider ID#1 successfully."
         ],
         "data": {
-          "id": 2,
+          "id": 1,
           "firstName": "Rico",
           "lastName": "Orelly",
           "email": "rico.orelly@gmail.com",
@@ -168,7 +168,7 @@ export class RidersController {
   @ApiParam({
     name: 'id',
     description: 'Rider ID',
-    example: 2,
+    example: 1,
     required: true,
     type: Number,
   })
@@ -191,10 +191,10 @@ export class RidersController {
       example: {
         "statusCode": 200,
         "message": [
-          "Update rider ID#2 successfully."
+          "Update rider ID#1 successfully."
         ],
         "data": {
-          "id": 2,
+          "id": 1,
           "firstName": "Rico",
           "lastName": "Orelly",
           "email": "rico.orelly@gmail.com",
@@ -209,7 +209,7 @@ export class RidersController {
   @ApiParam({
     name: 'id',
     description: 'Rider ID',
-    example: 2,
+    example: 1,
     required: true,
     type: Number,
   })
@@ -244,14 +244,14 @@ export class RidersController {
     schema: {
       example: {
         statusCode: 200,
-        message: [`Delete rider ID#2 successfully.`],
+        message: [`Delete rider ID#1 successfully.`],
       },
     },
   })
   @ApiParam({
     name: 'id',
     description: 'Rider ID',
-    example: 2,
+    example: 1,
     required: true,
     type: Number,
   })
@@ -277,7 +277,7 @@ export class RidersController {
         ],
         "data": {
           "id": 1,
-          "riderId": 2,
+          "riderId": 1,
           "latitude": -20.1923,
           "longitude": 150.775565,
           "createdAt": "2025-03-10T06:40:04.956Z",
@@ -289,7 +289,7 @@ export class RidersController {
   @ApiParam({
     name: 'riderId',
     description: 'Rider ID',
-    example: 2,
+    example: 1,
     required: true,
     type: Number,
   })
@@ -322,38 +322,36 @@ export class RidersController {
     status: HttpStatus.OK,
     description: 'Fetch rider location by ID successfully.',
     schema: {
-      examples: {
-        example1: {
-          "statusCode": 200,
-          "message": [
-            "Fetch rider location successfully."
-          ],
-          "data": {
+      example: {
+        "statusCode": 200,
+        "message": [
+          "Fetch rider location successfully."
+        ],
+        "data": {
+          "id": 1,
+          "riderId": 1,
+          "latitude": -20.1923,
+          "longitude": 150.775565,
+          "createdAt": "2025-03-10T06:40:04.956Z",
+          "updatedAt": "2025-03-10T12:26:35.067Z",
+          "rider": {
             "id": 1,
-            "riderId": 2,
-            "latitude": -20.1923,
-            "longitude": 150.775565,
-            "createdAt": "2025-03-10T06:40:04.956Z",
-            "updatedAt": "2025-03-10T12:26:35.067Z",
-            "rider": {
-              "id": 2,
-              "firstName": "Rico",
-              "lastName": "Orelly",
-              "email": "rico.orelly@gmail.com",
-              "licensePlate": "1กข 1234 กรุงเทพมหานคร",
-              "phoneNumber": "0812345678",
-              "createdAt": "2025-03-10T04:10:25.160Z",
-              "updatedAt": "2025-03-31T14:54:31.582Z"
-            }
+            "firstName": "Rico",
+            "lastName": "Orelly",
+            "email": "rico.orelly@gmail.com",
+            "licensePlate": "1กข 1234 กรุงเทพมหานคร",
+            "phoneNumber": "0812345678",
+            "createdAt": "2025-03-10T04:10:25.160Z",
+            "updatedAt": "2025-03-31T14:54:31.582Z"
           }
-        },
+        }
       },
     },
   })
   @ApiParam({
     name: 'riderId',
     description: 'Rider ID',
-    example: 2,
+    example: 1,
     required: true,
     type: Number,
   })

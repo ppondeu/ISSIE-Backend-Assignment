@@ -21,11 +21,10 @@ async function bootstrap() {
     .setTitle('Riders API')
     .setDescription('The riders API description')
     .setVersion('1.0')
-    .addTag('riders')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
-  
+
   await app.listen(process.env.SERVER_PORT, process.env.SERVER_HOST, () => {
     console.log("server is listening on port", process.env.SERVER_PORT);
   });
